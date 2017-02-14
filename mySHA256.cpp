@@ -9,6 +9,8 @@
 //
 //  This implements the SHA256 spec from http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
 //
+//  To compile: g++ -O3 -std=c++11 -o mySHA256 mySHA256.cpp
+//
 
 #include <iostream>
 using namespace std;
