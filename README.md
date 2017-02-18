@@ -4,4 +4,4 @@ This is my simple implementation to learn the SHA 256 algorithm. Do not use it f
 
 This implements the SHA256 spec from http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
 
-The variable names etc should match those in the NIST spec.
+The variable names should match those in the NIST spec.
