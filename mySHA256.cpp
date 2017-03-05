@@ -12,7 +12,10 @@
 //  To compile: g++ -O3 -std=c++11 -o mySHA256 mySHA256.cpp
 //
 
+#include <sstream>
 #include <iostream>
+#include <fstream>
+#include <iomanip>
 using namespace std;
 
 uint32_t K[64] =
@@ -25,8 +28,10 @@ uint32_t K[64] =
     0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
 
-uint32_t H[8] =
+const uint32_t HStart[8] =
    {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
+
+uint32_t H[8];
 
 inline
 uint32_t Ch(uint32_t x, uint32_t y, uint32_t z) {
@@ -76,6 +81,10 @@ void printBlk(unsigned char* message) {
     printf("\n");
 }
 
+void hashInit() {
+    for (long i = 0; i < 8; i++) H[i] = HStart[i];
+}
+
 void hashM(unsigned char* M) {
     // printBlk(M);
     uint32_t W[64];
@@ -120,14 +129,15 @@ void hashM(unsigned char* M) {
     
 }
 
-
-int main(int argc, const char * argv[]) {
+string sha256(istream& in) {
     int inChar;
     uint64_t totalLen = 0;
     int b = 0;
     unsigned char message[64];
 
-    while ((inChar = cin.get()) != EOF) {
+    hashInit();
+
+    while ((inChar = in.get()) != EOF) {
         //printf("0x%08x\n", inChar);
         message[b++] = inChar;
         totalLen += 8;
@@ -136,8 +146,11 @@ int main(int argc, const char * argv[]) {
             hashM(message);
         }
     }
-    
     message[b++] = 0x80;
+    if (b == 512/8) {
+        hashM(message);
+        b = 0;
+    }
     while(b != 448/8) {
         message[b++] = 0x00;
         if (b == 512/8) {
@@ -149,10 +162,15 @@ int main(int argc, const char * argv[]) {
         message[b++] = ((totalLen >> (8*s)) & 0xff);
     }
     hashM(message);
-    
+    ostringstream hash;
     for (long i = 0; i < 8; i++) {
-        printf("%08x", H[i]);
+        //printf("%08x", H[i]);
+        hash << hex << setfill('0') << setw(8) << H[i];
     }
-    printf("\n");
+    return hash.str();
+}
+
+int main(int argc, const char * argv[]) {
+    cout << sha256(cin) << endl;
     return 0;
 }
